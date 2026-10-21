@@ -1,0 +1,20 @@
+{
+  "extName": { "message": "PHPeek — Instant PHP2Shell Check" },
+  "extDescription": { "message": "Peek before you trust. One glance tells you if a site runs a PHP version exposed to PHP2Shell. Zero data collected." },
+  "loading": { "message": "Peeking…" },
+  "noData": { "message": "Nothing to peek at yet. Reload the page." },
+  "notPhp": { "message": "No PHP in sight. Nothing to worry about here." },
+  "vulnTitle": { "message": "Likely exposed · PHP $1" },
+  "vulnNote": { "message": "PHP2Shell is fixed in $1. Heads-up: some Linux distros patch without bumping the version number, so this is a strong hint, not proof." },
+  "eolTitle": { "message": "Out of support · PHP $1" },
+  "eolNote": { "message": "PHP 8.1 and older never got an official PHP2Shell fix. Only safe if the host backported it." },
+  "patchedTitle": { "message": "All good · PHP $1" },
+  "hiddenTitle": { "message": "Runs PHP, keeps its version secret" },
+  "hiddenNote": { "message": "Can't tell from the outside. That's normal — and smart security." },
+  "hiddenVersion": { "message": "hidden" },
+  "rowSite": { "message": "Site" },
+  "rowPhp": { "message": "PHP" },
+  "rowCms": { "message": "CMS" },
+  "rowGenerator": { "message": "Built with" },
+  "footer": { "message": "100% passive. No requests, no tracking, no data. Open source." }
+}

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { --bg:#fff; --fg:#1f2328; --muted:#636c76; --line:#e6e8eb;
+          --red-bg:#fde8e6; --red:#a50e0e; --green-bg:#e6f4ea; --green:#137333;
+          --amber-bg:#fef3d6; --amber:#8a5300; --grey-bg:#f1f3f4; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#16181d; --fg:#e8eaed; --muted:#9aa0a6; --line:#2a2e35;
+            --red-bg:#3c1614; --red:#f6aea9; --green-bg:#11301c; --green:#81c995;
+            --amber-bg:#3a2a08; --amber:#fdd663; --grey-bg:#23262c; }
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; width: 320px;
+         margin: 0; padding: 14px; background: var(--bg); color: var(--fg); }
+  header { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  header img { width:28px; height:28px; }
+  header h1 { font-size:15px; margin:0; letter-spacing:.2px;
+              background:linear-gradient(90deg,#7c3aed,#ec4899); -webkit-background-clip:text;
+              background-clip:text; color:transparent; }
+  header small { display:block; font-size:11px; color:var(--muted); }
+  .status { padding:10px 12px; border-radius:8px; font-weight:600; margin-bottom:12px; }
+  .vulnerable, .eol { background:var(--red-bg); color:var(--red); }
+  .patched { background:var(--green-bg); color:var(--green); }
+  .unknown { background:var(--amber-bg); color:var(--amber); }
+  .none { background:var(--grey-bg); color:var(--muted); }
+  dl { margin:0; display:grid; grid-template-columns:auto 1fr; gap:4px 12px; }
+  dt { color:var(--muted); }
+  dd { margin:0; word-break:break-all; }
+  p.note { color:var(--muted); font-size:12px; margin:10px 0 0; }
+  footer { margin-top:12px; padding-top:8px; border-top:1px solid var(--line);
+           color:var(--muted); font-size:11px; }
+</style>
+</head>
+<body>
+  <header><img src="icons/icon-48.png" alt=""><div><h1>PHPeek</h1><small>Peek before you trust.</small></div></header>
+  <div id="status" class="status none"></div>
+  <dl id="details"></dl>
+  <p class="note" id="note"></p>
+  <footer id="footer"></footer>
+  <script src="popup.js"></script>
+</body>
+</html>
