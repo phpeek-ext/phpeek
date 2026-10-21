@@ -1,0 +1,6 @@
+dist/
+node_modules/
+__pycache__/
+.DS_Store
+store/screenshots/popup-*.png
+PUBLISHING.md
