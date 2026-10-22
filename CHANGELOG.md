@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1
+- **Honest verdicts:** no more green "OK". A patched-looking server now reads "No affected PHP version advertised — what the server reports, not a guarantee", with no badge. Red verdicts read "advertises an affected version". (Thanks for the feedback on X.)
+- **Clear name:** "PHPeek — Hacked-Site Shield (PHP2Shell, Card & Wallet)", so the name says everything the extension does.
+- **Welcome page** on install (and when updating from 1.0/1.1): every protection, what it can see, what it never does, honest limits. Also linked from the popup.
+
 ## 1.2.0
 - **Card Guard — anti-skimmer:** after you type a real card number (Luhn + card brand), any script that tries to send it to a site that's neither the store nor a known payment provider is blocked: `fetch`, `XMLHttpRequest`, `sendBeacon`, WebSocket, image/script/iframe/link URLs, `setAttribute`, `form.submit()` and normal form posts, `window.open`. Catches plain, URL-encoded, base64 and reversed numbers. One warning window per page naming the destination. Dormant until a card is typed; wrappers stay patchable so Sentry/Zone.js-style libraries keep working.
 - **Card Guard — heads-up on exposed stores:** reach the card field on a PHP2Shell-exposed store and PHPeek suggests a safer way to pay. Once per site per tab.

@@ -3,6 +3,7 @@
 </p>
 
 <h1 align="center">PHPeek</h1>
+<p align="center"><i>Hacked-Site Shield: PHP2Shell check, card, password & wallet guards</i></p>
 <p align="center"><b>Peek before you trust.</b><br>
 Flags sites exposed to PHP2Shell, blocks card skimmers, and guards your passwords, seed phrase, wallet signatures and clipboard on every site.</p>
 
@@ -19,10 +20,12 @@ Reads the headers your browser already received and badges its icon:
 
 | Badge | What it means |
 |---|---|
-| 🔴 **!** | **Likely exposed.** The site shows a PHP version older than the fix — or PHP 8.1 and below, which never got one. Don't type passwords, cards or connect your wallet here. |
-| 🟢 **OK** | **All good.** The PHP version on display is patched. |
+| 🔴 **!** | **Affected version advertised.** The server reports a PHP version older than the fix — or PHP 8.1 and below, which never got one. Avoid typing passwords or cards, or connecting your wallet here. |
+| *(nothing)* | **No affected version advertised** — what the server reports, not a guarantee. |
 | 🟠 **?** | **Runs PHP, keeps its version secret.** |
 | *(nothing)* | **No PHP in sight.** |
+
+A header is an observation, not a guarantee: versions can be hidden, stale or patched by a distro without changing the number. That's why there's no green "OK", and why the guards below don't depend on it.
 
 The popup shows the verdict, not the exact version number, and a **📨 Tell the site owner** button that opens a ready-to-send email with the fix.
 
