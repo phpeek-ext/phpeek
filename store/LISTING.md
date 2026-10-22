@@ -1,11 +1,11 @@
-# Store listing copy (v1.2)
+# Store listing copy (v1.2.1)
 
 Copy-paste into the store forms when you upload v1.2.
 
 ---
 
 ## Name
-**PHPeek — PHP2Shell Check, Card & Wallet Guard**
+**PHPeek — Hacked-Site Shield (PHP2Shell, Card & Wallet)**
 
 ## Summary (Chrome max 132 chars)
 > Flags PHP2Shell-exposed sites, blocks card skimmers, guards passwords, seed phrases, wallet signatures and clipboard. Zero data.
@@ -23,9 +23,9 @@ PHPeek watches for exactly that.
 
 👀 PHP2SHELL CHECK
 Open any site and the icon tells you:
-🔴 "!" — Likely exposed. Don't type passwords or card details here.
-🟢 "OK" — Patched.
+🔴 "!" — The server advertises a PHP version affected by PHP2Shell. Avoid typing passwords or card details here.
 🟠 "?" — Runs PHP, keeps its version secret.
+No badge — no affected version advertised. That's what the server reports, not a guarantee.
 "Tell the site owner" opens a ready-to-send email with the fix.
 
 🔎 CHECK ANY SITE
