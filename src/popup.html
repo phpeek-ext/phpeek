@@ -12,6 +12,7 @@
             --amber-bg:#3a2a08; --amber:#fdd663; --grey-bg:#23262c; }
   }
   *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display:none !important; }
   body { font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; width: 320px;
          margin: 0; padding: 14px; background: var(--bg); color: var(--fg); }
   header { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
@@ -21,6 +22,13 @@
               background-clip:text; color:transparent; }
   header small { display:block; font-size:11px; color:var(--muted); }
   .status { padding:10px 12px; border-radius:8px; font-weight:600; margin-bottom:12px; }
+  #tell { display:block; width:100%; margin:12px 0 0; padding:9px 10px; border-radius:8px; border:1px solid var(--line);
+          background:transparent; color:var(--fg); font:inherit; font-weight:600; cursor:pointer; }
+  #tell:hover { background:var(--grey-bg); }
+  .guards { margin:12px 0 0; padding:10px 12px; border-radius:8px; background:var(--grey-bg); font-size:12px; }
+  .guards b { display:block; margin-bottom:4px; color:var(--muted); font-weight:600; }
+  .guards span { display:inline-block; margin-right:10px; }
+  .guards span::before { content:"✓ "; color:#188038; font-weight:700; }
   .vulnerable, .eol { background:var(--red-bg); color:var(--red); }
   .patched { background:var(--green-bg); color:var(--green); }
   .unknown { background:var(--amber-bg); color:var(--amber); }
@@ -38,6 +46,8 @@
   <div id="status" class="status none"></div>
   <dl id="details"></dl>
   <p class="note" id="note"></p>
+  <button id="tell" hidden></button>
+  <div class="guards"><b id="guardsTitle"></b><span id="gSeed"></span><span id="gSig"></span><span id="gClip"></span></div>
   <footer id="footer"></footer>
   <script src="popup.js"></script>
 </body>

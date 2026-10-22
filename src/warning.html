@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PHPeek warning</title>
+<style>
+  :root { --bg:#fff; --fg:#1f2328; --muted:#636c76; --line:#e6e8eb; --red:#c5221f; --red-bg:#fde8e6;
+          --amber:#8a5300; --amber-bg:#fef3d6; --btn:#1f2328; --btn-fg:#fff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#16181d; --fg:#e8eaed; --muted:#9aa0a6; --line:#2a2e35; --red:#f6aea9; --red-bg:#3c1614;
+            --amber:#fdd663; --amber-bg:#3a2a08; --btn:#e8eaed; --btn-fg:#16181d; }
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display:none !important; }
+  body { margin:0; font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--fg); }
+  .band { padding:18px 22px; display:flex; gap:12px; align-items:center; }
+  .band.high { background:var(--red-bg); color:var(--red); }
+  .band.medium { background:var(--amber-bg); color:var(--amber); }
+  .band img { width:40px; height:40px; flex:none; }
+  .band small { display:block; font-size:12px; font-weight:600; letter-spacing:.4px; text-transform:uppercase; opacity:.85; }
+  .band h1 { margin:2px 0 0; font-size:19px; line-height:1.25; }
+  main { padding:18px 22px 22px; }
+  .site { font-size:13px; color:var(--muted); margin:0 0 14px; word-break:break-all; }
+  .site b { color:var(--fg); }
+  ul { margin:0 0 18px; padding-left:18px; }
+  li { margin:0 0 8px; }
+  label { display:flex; gap:8px; align-items:flex-start; font-size:13px; margin:0 0 16px; cursor:pointer; }
+  .actions { display:flex; flex-direction:column; gap:8px; }
+  button { font:inherit; font-weight:600; border-radius:10px; padding:12px 14px; cursor:pointer; border:1px solid var(--line); }
+  #stop { background:var(--btn); color:var(--btn-fg); border-color:var(--btn); font-size:15px; }
+  #go { background:transparent; color:var(--muted); }
+  #go:disabled { opacity:.45; cursor:not-allowed; }
+  footer { margin-top:18px; padding-top:10px; border-top:1px solid var(--line); font-size:11px; color:var(--muted); }
+</style>
+</head>
+<body>
+  <div class="band" id="band">
+    <img src="icons/icon-48.png" alt="">
+    <div><small id="kicker">PHPeek</small><h1 id="title">Checking…</h1></div>
+  </div>
+  <main>
+    <p class="site" id="site"></p>
+    <ul id="reasons"></ul>
+    <label id="ack" hidden><input type="checkbox" id="ackbox"> <span id="acktext"></span></label>
+    <div class="actions">
+      <button id="stop"></button>
+      <button id="go"></button>
+    </div>
+    <footer>This window belongs to PHPeek, not to the website, so the site can't hide or fake it. PHPeek sees no keys and sends nothing anywhere.</footer>
+  </main>
+  <script src="warning.js"></script>
+</body>
+</html>
