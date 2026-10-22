@@ -111,4 +111,9 @@ ok(fieldHint(fake({ type: "password", name: "password" })) === "password", "pass
 ok(fieldHint(fake({ name: "mnemonic" })) === "seed", "mnemonic field is a seed field");
 ok(fieldHint(fake({ placeholder: "Enter your 12 words recovery phrase" })) === "seed", "recovery phrase placeholder → seed field");
 ok(fieldHint(fake({ type: "search" })) === "search", "search field skipped");
+ok(looksLikeTypedSeed("jhgfd jhgfju retytet abandon ability able", 3), "junk before a seed in a seed field still trips");
+ok(looksLikeTypedSeed("hi support, here it is: abandon ability able about above absent absorb abstract"), "seed after a sentence trips at 8 words");
+ok(!looksLikeTypedSeed("hi support, here it is: abandon ability able about above absent absorb"), "…but not at 7 in a normal field");
+const prose = "Thank you for your order. We will ship your fresh coffee beans tomorrow morning and send the tracking number by email. Please check the spam folder if you do not see it within one day.";
+ok(!looksLikeTypedSeed(prose), "normal prose doesn't trip");
 console.log(`hardening checks passed (total ${n})`);

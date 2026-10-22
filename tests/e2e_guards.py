@@ -138,6 +138,8 @@ def main():
         w = info.value; w.wait_for_load_state(); time.sleep(0.3)
         check("seed phrase" in w.inner_text("#title").lower(), "typing 6 seed words trips Seed Shield")
         check(page.input_value("#t") == "", "field is cleared immediately")
+        page.keyboard.type(" absorb abstract", delay=5); time.sleep(0.3)
+        check(page.input_value("#t") == "", "words typed while the warning is open are cleared too")
         w.screenshot(path=str(SHOTS / "warn-seed.png"))
         press(w, "#go"); time.sleep(0.5)
         check(page.input_value("#t").startswith("abandon ability"), "'not a seed phrase' restores the text")
