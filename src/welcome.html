@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcome to PHPeek</title>
+<style>
+  :root { --bg:#f7f7f9; --card:#fff; --fg:#1f2328; --muted:#5f6670; --line:#e4e6ea; --accent:#7c3aed; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111317; --card:#181b21; --fg:#e8eaed; --muted:#9aa0a6; --line:#2a2e35; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 20px 64px; }
+  header { display:flex; align-items:center; gap:16px; margin-bottom: 8px; }
+  header img { width:56px; height:56px; }
+  h1 { font-size: 30px; margin: 0; }
+  .lead { color: var(--muted); font-size: 18px; margin: 4px 0 28px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin: 14px 0; }
+  h2 { font-size: 18px; margin: 0 0 6px; }
+  p { margin: 6px 0; }
+  .sees { color: var(--muted); font-size: 14px; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  a { color: var(--accent); }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <header><img src="icons/icon-128.png" alt=""><h1>Welcome to PHPeek</h1></header>
+  <p class="lead">A safety net for hacked websites. Here's exactly what it does, what it can see, and what it never does.</p>
+
+  <section>
+    <h2>👀 PHP2Shell check</h2>
+    <p>Reads the response headers of the page you open and shows a red <b>!</b> when the server advertises a PHP version affected by PHP2Shell (CVE-2026-109618 / CVE-2026-109619). It's what the server reports, not proof either way.</p>
+    <p class="sees">Sees: response headers of the page you open. Changes: nothing.</p>
+  </section>
+
+  <section>
+    <h2>💳 Card Guard</h2>
+    <p>When you type a card number, PHPeek remembers it <i>in that page only</i> and blocks a page script from sending it to a site that is neither the store nor a known payment provider. That's how card skimmers on hacked stores work. On stores that look exposed, you get a heads-up at the card field.</p>
+    <p class="sees">Sees: numbers typed into page fields and requests the page sends while a card is typed. Never stores or sends your card anywhere.</p>
+  </section>
+
+  <section>
+    <h2>🔑 Password Guard</h2>
+    <p>On sites that look exposed to PHP2Shell, a heads-up when you reach a password field. It never reads your password.</p>
+  </section>
+
+  <section>
+    <h2>🛡️ Seed Shield · ✍️ Wallet signature check · 📋 Clipboard Guard</h2>
+    <ul>
+      <li><b>Seed Shield:</b> a crypto recovery phrase typed or pasted into a website is cleared, and you're told why.</li>
+      <li><b>Wallet signature check:</b> before your wallet opens, risky requests (unlimited token approvals, "approve all NFTs", Permit, blind signing) are paused and explained. You decide. PHPeek never sees keys and never signs anything.</li>
+      <li><b>Clipboard Guard:</b> if a page secretly puts a command in your clipboard (fake "I'm not a robot" pages), it's replaced with a harmless warning.</li>
+    </ul>
+    <p class="sees">Sees: text typed into page fields, wallet requests the page makes, text the page writes to your clipboard. Nothing is stored or sent.</p>
+  </section>
+
+  <section>
+    <h2>🔎 Check any site</h2>
+    <p>Type an address in the PHPeek popup to check it before you open it. This is the only time PHPeek contacts a website: it loads that one page, without cookies, and reads its headers.</p>
+  </section>
+
+  <div class="grid">
+    <section>
+      <h2>Never</h2>
+      <ul>
+        <li>No tracking, analytics or ads</li>
+        <li>No PHPeek server, no remote code</li>
+        <li>Never sends your data anywhere</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Honest limits</h2>
+      <ul>
+        <li>It can't remove malware already on your computer</li>
+        <li>Some skimmers and drainers can still get through</li>
+        <li>Prefer PayPal / Apple Pay / Google Pay on unknown stores</li>
+      </ul>
+    </section>
+  </div>
+
+  <p class="sees">Warnings open in PHPeek's own window, so a website can't hide or fake them. Open source: <a href="https://github.com/phpeek-ext/phpeek" target="_blank" rel="noopener">github.com/phpeek-ext/phpeek</a> · <a href="https://github.com/phpeek-ext/phpeek/blob/main/PRIVACY.md" target="_blank" rel="noopener">Privacy policy</a></p>
+</main>
+</body>
+</html>

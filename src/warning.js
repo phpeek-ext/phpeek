@@ -26,7 +26,7 @@
   site.append("On ");
   const b = document.createElement("b"); b.textContent = info.host || info.frame || "this site"; site.append(b);
   if (info.frame && info.frame !== info.host) site.append(` (inside a frame from ${info.frame})`);
-  if (info.siteStatus === "vulnerable" || info.siteStatus === "eol") site.append(" · 🔴 exposed to PHP2Shell");
+  if (info.siteStatus === "vulnerable" || info.siteStatus === "eol") site.append(" · 🔴 advertises a PHP2Shell-affected version");
   if (info.method) site.append(` · ${info.method}`);
   $("site").append(site);
 

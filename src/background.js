@@ -56,7 +56,8 @@ function badgeFor(state) {
   const usesPhp = state.usesPhp || state.cms.length > 0;
   const s = state.assessment.status;
   if (s === "vulnerable" || s === "eol") return { text: "!", color: "#D93025" };
-  if (s === "patched") return { text: "OK", color: "#188038" };
+  // A header is an observation, not a guarantee: nothing to flag means no badge, never a green "OK".
+  if (s === "patched") return { text: "", color: "#888888" };
   if (usesPhp) return { text: "?", color: "#E37400" };
   return { text: "", color: "#888888" };
 }
@@ -139,6 +140,13 @@ function render(verdict, siteRisky) {
 const isRisky = (state) => !!state && ["vulnerable", "eol"].includes(state.assessment.status);
 
 if (typeof chrome !== "undefined" && chrome.webRequest) {
+  // First install: open a page that explains every protection and what PHPeek can see.
+  chrome.runtime.onInstalled.addListener((d) => {
+    if (d.reason === "install" || (d.reason === "update" && /^1\.[01]\./.test(d.previousVersion || ""))) {
+      chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") }).catch(() => {});
+    }
+  });
+
   const key = (tabId) => `tab_${tabId}`;
 
   const getState = async (tabId) =>

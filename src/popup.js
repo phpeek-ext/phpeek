@@ -1,7 +1,9 @@
 (async () => {
   const t = (key, subs) => chrome.i18n.getMessage(key, subs) || key;
   const $ = (id) => document.getElementById(id);
-  $("footer").textContent = t("footer");
+  $("footer").textContent = t("footer") + " ";
+  const more = document.createElement("a"); more.href = "welcome.html"; more.target = "_blank"; more.textContent = t("welcomeLink");
+  $("footer").append(more);
   $("guardsTitle").textContent = t("guardsTitle");
   for (const [id, key] of [["gSeed", "guardSeed"], ["gSig", "guardSig"], ["gClip", "guardClip"], ["gCard", "guardCard"], ["gPass", "guardPass"]]) $(id).textContent = t(key);
   $("status").textContent = t("loading");
@@ -12,7 +14,7 @@
     const a = s.assessment || {};
     if (a.status === "vulnerable") return { cls: "vulnerable", text: t("vulnTitle"), note: t("vulnNote"), label: t("statusExposed") };
     if (a.status === "eol") return { cls: "eol", text: t("eolTitle"), note: t("eolNote"), label: t("statusEol") };
-    if (a.status === "patched") return { cls: "patched", text: t("patchedTitle"), note: "", label: t("statusPatched") };
+    if (a.status === "patched") return { cls: "patched", text: t("patchedTitle"), note: t("patchedNote"), label: t("statusPatched") };
     if (usesPhp) return { cls: "unknown", text: t("hiddenTitle"), note: t("hiddenNote"), label: t("statusHidden") };
     return { cls: "none", text: t("notPhp"), note: "", label: "—" };
   }
