@@ -11,7 +11,7 @@ def manifest(target):
     m = json.loads((ROOT / "manifest.base.json").read_text())
     if target == "chrome":
         m["background"] = {"service_worker": "background.js"}
-        m["minimum_chrome_version"] = "102"
+        m["minimum_chrome_version"] = "111"
     else:
         m["background"] = {"scripts": ["background.js"]}
         m["browser_specific_settings"] = {
