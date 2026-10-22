@@ -37,6 +37,16 @@
   dt { color:var(--muted); }
   dd { margin:0; word-break:break-all; }
   p.note { color:var(--muted); font-size:12px; margin:10px 0 0; }
+  .check { margin:12px 0 0; }
+  .check b { display:block; margin-bottom:6px; font-size:12px; color:var(--muted); font-weight:600; }
+  .check form { display:flex; gap:6px; }
+  .check input { flex:1; min-width:0; padding:8px 10px; border-radius:8px; border:1px solid var(--line);
+                 background:var(--bg); color:var(--fg); font:inherit; }
+  .check button { padding:8px 12px; border-radius:8px; border:0; background:#7c3aed; color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+  .check button:disabled { opacity:.6; cursor:default; }
+  #cres { margin-top:8px; }
+  #cres .status { margin:0; font-size:12.5px; }
+  #cres p { color:var(--muted); font-size:12px; margin:6px 0 0; }
   footer { margin-top:12px; padding-top:8px; border-top:1px solid var(--line);
            color:var(--muted); font-size:11px; }
 </style>
@@ -47,7 +57,11 @@
   <dl id="details"></dl>
   <p class="note" id="note"></p>
   <button id="tell" hidden></button>
-  <div class="guards"><b id="guardsTitle"></b><span id="gSeed"></span><span id="gSig"></span><span id="gClip"></span></div>
+  <div class="guards"><b id="guardsTitle"></b><span id="gSeed"></span><span id="gSig"></span><span id="gClip"></span><span id="gCard"></span><span id="gPass"></span></div>
+  <div class="check"><b id="checkTitle"></b>
+    <form id="cform"><input id="curl" autocomplete="off" spellcheck="false" inputmode="url"><button id="cbtn" type="submit"></button></form>
+    <div id="cres"></div>
+  </div>
   <footer id="footer"></footer>
   <script src="popup.js"></script>
 </body>

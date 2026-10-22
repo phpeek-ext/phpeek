@@ -1,27 +1,101 @@
 {
-  "extName": { "message": "PHPeek — PHP2Shell Check & Wallet Guard" },
-  "extDescription": { "message": "Peek before you trust. Flags sites exposed to PHP2Shell and guards your seed phrase, wallet signatures and clipboard. Zero data collected." },
-  "loading": { "message": "Peeking…" },
-  "noData": { "message": "Nothing to peek at yet. Reload the page." },
-  "notPhp": { "message": "No PHP in sight. Nothing to worry about here." },
-  "vulnTitle": { "message": "Likely exposed to PHP2Shell" },
-  "vulnNote": { "message": "This site advertises a PHP version older than the fix. Don't type passwords, card details or connect your wallet here until it's patched. Some Linux distros patch without bumping the version, so this is a strong hint, not proof." },
-  "eolTitle": { "message": "Out of support: no PHP2Shell fix" },
-  "eolNote": { "message": "This site runs a PHP branch that never got an official fix. Treat it as exposed: no passwords, cards or wallet connections." },
-  "patchedTitle": { "message": "All good · patched PHP" },
-  "hiddenTitle": { "message": "Runs PHP, keeps its version secret" },
-  "hiddenNote": { "message": "Can't tell from the outside. That's normal — and smart security." },
-  "rowSite": { "message": "Site" },
-  "rowStatus": { "message": "PHP" },
-  "rowCms": { "message": "CMS" },
-  "statusExposed": { "message": "exposed" },
-  "statusEol": { "message": "out of support" },
-  "statusPatched": { "message": "patched" },
-  "statusHidden": { "message": "hidden" },
-  "tellOwner": { "message": "📨 Tell the site owner" },
-  "guardsTitle": { "message": "Always on, on every site" },
-  "guardSeed": { "message": "Seed Shield" },
-  "guardSig": { "message": "Wallet signature check" },
-  "guardClip": { "message": "Clipboard Guard" },
-  "footer": { "message": "100% local. No requests, no tracking, no data. Only checks the tab you're on; never scans or lists sites. Open source." }
+  "extName": {
+    "message": "PHPeek — PHP2Shell Check, Card & Wallet Guard"
+  },
+  "extDescription": {
+    "message": "Flags PHP2Shell-exposed sites, blocks card skimmers, guards passwords, seed phrases, wallet signatures and clipboard. Zero data."
+  },
+  "loading": {
+    "message": "Peeking…"
+  },
+  "noData": {
+    "message": "Nothing to peek at yet. Reload the page."
+  },
+  "notPhp": {
+    "message": "No PHP in sight. Nothing to worry about here."
+  },
+  "vulnTitle": {
+    "message": "Likely exposed to PHP2Shell"
+  },
+  "vulnNote": {
+    "message": "This site advertises a PHP version older than the fix. Don't type passwords, card details or connect your wallet here until it's patched. Some Linux distros patch without bumping the version, so this is a strong hint, not proof."
+  },
+  "eolTitle": {
+    "message": "Out of support: no PHP2Shell fix"
+  },
+  "eolNote": {
+    "message": "This site runs a PHP branch that never got an official fix. Treat it as exposed: no passwords, cards or wallet connections."
+  },
+  "patchedTitle": {
+    "message": "All good · patched PHP"
+  },
+  "hiddenTitle": {
+    "message": "Runs PHP, keeps its version secret"
+  },
+  "hiddenNote": {
+    "message": "Can't tell from the outside. That's normal — and smart security."
+  },
+  "rowSite": {
+    "message": "Site"
+  },
+  "rowStatus": {
+    "message": "PHP"
+  },
+  "rowCms": {
+    "message": "CMS"
+  },
+  "statusExposed": {
+    "message": "exposed"
+  },
+  "statusEol": {
+    "message": "out of support"
+  },
+  "statusPatched": {
+    "message": "patched"
+  },
+  "statusHidden": {
+    "message": "hidden"
+  },
+  "tellOwner": {
+    "message": "📨 Tell the site owner"
+  },
+  "guardsTitle": {
+    "message": "Always on, on every site"
+  },
+  "guardSeed": {
+    "message": "Seed Shield"
+  },
+  "guardSig": {
+    "message": "Wallet signature check"
+  },
+  "guardClip": {
+    "message": "Clipboard Guard"
+  },
+  "footer": {
+    "message": "No tracking, no data collected, open source. PHPeek only contacts a site when you use “Check any site”."
+  },
+  "guardCard": {
+    "message": "Card Guard"
+  },
+  "guardPass": {
+    "message": "Password Guard"
+  },
+  "checkTitle": {
+    "message": "Check any site"
+  },
+  "checkPlaceholder": {
+    "message": "shop-example.com"
+  },
+  "checkBtn": {
+    "message": "Check"
+  },
+  "checking": {
+    "message": "Checking…"
+  },
+  "checkBad": {
+    "message": "That doesn't look like a web address."
+  },
+  "checkFail": {
+    "message": "Couldn't reach that site."
+  }
 }

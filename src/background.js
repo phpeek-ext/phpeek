@@ -1,7 +1,8 @@
 // PHPeek background.
 // - Passive PHP2Shell check from the response headers the browser already received.
 // - Opens PHPeek's own warning window when a guard trips, and relays your decision.
-// Makes no network requests of its own and collects no data.
+// - "Check a site": when YOU type an address in the popup, fetches that one page (no cookies)
+//   and reads its headers. That's the only network request PHPeek ever makes. No data collected.
 
 // First fixed release on each supported branch (CVE-2026-109618 / CVE-2026-109619).
 const PATCHED = { "8.5": 12, "8.4": 27, "8.3": 36, "8.2": 35 };
@@ -66,6 +67,7 @@ function badgeFor(state) {
 // raw values, which are validated (addresses must be 0x + 40 hex, names plain and short).
 
 const fmtAddr = (a) => (typeof a === "string" && /^0x[0-9a-fA-F]{40}$/.test(a) ? `${a.slice(0, 6)}…${a.slice(-4)}` : "an unknown address");
+const fmtHost = (h) => (typeof h === "string" && /^[a-z0-9.-]{1,40}$/i.test(h) ? h : "an unknown site");
 const fmtName = (s) => (typeof s === "string" && /^[\w .\-]{1,32}$/.test(s) ? s : "an unknown contract");
 const EXPOSED_NOTE = "This site shows signs of an unpatched PHP2Shell server. It may be compromised.";
 
@@ -104,8 +106,26 @@ const TEMPLATES = {
     "No real website, wallet, exchange or support team will EVER ask for your recovery phrase.",
     "Anyone who has it owns your funds, forever. PHPeek cleared the field.",
     "Already typed it somewhere? Move your funds to a brand-new wallet now."]],
+  "card-exposed": () => ["medium", "Careful paying on this site", [
+    "This store's server appears to run a PHP version exposed to PHP2Shell, a critical flaw being exploited right now.",
+    "Hacked stores often get a hidden script that copies card numbers at checkout.",
+    "Safer: pay with PayPal, Apple Pay or Google Pay, or a virtual one-time card. Or buy elsewhere until they patch."]],
+  "skimmer": (f) => ["high", "PHPeek stopped your card number from being sent", [
+    `A script on this page tried to send the card number you typed to ${fmtHost(f.domain)}, which isn't this store or a payment provider PHPeek knows.`,
+    "That's what card skimmers on hacked stores do. It could also be a payment service PHPeek doesn't know yet, so if the checkout now fails, that's why.",
+    "Safer: pay with PayPal, Apple Pay or Google Pay. If you've already paid on this site and don't trust it, keep an eye on your card statement."]],
+  "card-send": (f) => ["medium", `Send your card number to ${fmtHost(f.domain)}?`, [
+    `This form is about to send the card number you typed to ${fmtHost(f.domain)}, which isn't this store or a payment provider PHPeek knows.`,
+    "Some smaller payment services work this way. So do fake payment forms on hacked stores.",
+    "If you don't recognise it as the store's payment provider, don't send it: pay with PayPal, Apple Pay or Google Pay instead."]],
+  "password-exposed": () => ["medium", "Careful with your password here", [
+    "This site's server appears to run a PHP version exposed to PHP2Shell, a critical flaw being exploited right now.",
+    "The flaw can leak data from the server's memory, including passwords other people just typed.",
+    "Use a password you don't use anywhere else and turn on two-factor authentication. If you can, wait until the site is patched."]],
 };
-const KIND_OF = { clickfix: "clipboard", seed: "seed" };
+const KIND_OF = { clickfix: "clipboard", seed: "seed", "card-exposed": "card", skimmer: "card", "card-send": "card", "password-exposed": "password" };
+const ONCE = { "card-exposed": 1, "password-exposed": 1 };   // once per site per tab
+const NOTIFY = { clickfix: 1, "card-exposed": 1, skimmer: 1, "password-exposed": 1 };   // heads-ups: nothing to decide
 
 function render(verdict, siteRisky) {
   const tpl = verdict && Object.prototype.hasOwnProperty.call(TEMPLATES, verdict.code) && TEMPLATES[verdict.code];
@@ -179,15 +199,24 @@ if (typeof chrome !== "undefined" && chrome.webRequest) {
     const kind = KIND_OF[msg.verdict && msg.verdict.code] || "signature";
     // Unknown code = something tampered with the request. Fail closed, no window.
     if (!verdict || kind !== (msg.kind === "signature" ? "signature" : msg.kind)) return respond({ allow: false });
-    const notifyOnly = kind === "clipboard";
-    // One PHPeek window per frame at a time, at most 6 a minute per frame: a page (or an ad
-    // frame) can't spam you, and can't use up the budget of the dapp's own frame.
+    const notifyOnly = NOTIFY[msg.verdict.code] === 1;
+    // One PHPeek window to decide in per frame at a time, at most 6 a minute per frame, and at most
+    // 3 heads-ups a minute per tab: a page (or its iframes) can't spam you with PHPeek windows.
     const key = `${tabId}:${sender.frameId || 0}`;
     const now = Date.now();
     const times = (recent.get(key) || []).filter((t) => now - t < 60000);
-    const busy = [...pending.values()].some((p) => p.key === key && !p.done);
-    if (busy || times.length >= 6) return respond({ allow: false });
+    const busy = !notifyOnly && [...pending.values()].some((p) => p.key === key && !p.done && !p.info.notifyOnly);
+    const tabKey = `notify:${tabId}`;
+    const notes = (recent.get(tabKey) || []).filter((t) => now - t < 60000);
+    if (busy || times.length >= 6 || (notifyOnly && notes.length >= 3)) return respond({ allow: false });
+    if (ONCE[msg.verdict.code]) {
+      const site = (sender.tab && sender.tab.url && new URL(sender.tab.url).hostname) || msg.frame;
+      const k = `once_${tabId}_${site}_${msg.verdict.code}`;
+      if ((await chrome.storage.session.get(k))[k]) return respond({ allow: true });
+      await chrome.storage.session.set({ [k]: 1 });
+    }
     times.push(now); recent.set(key, times);
+    if (notifyOnly) { notes.push(now); recent.set(tabKey, notes); }
     const id = `w${now.toString(36)}${++counter}`;
     pending.set(id, {
       key,
@@ -203,7 +232,7 @@ if (typeof chrome !== "undefined" && chrome.webRequest) {
         siteStatus: state ? state.assessment.status : "unknown",
       },
     });
-    if (notifyOnly) respond({ allow: true });
+    if (notifyOnly) respond({ allow: true, shown: true });
     const win = await chrome.windows.create({
       url: chrome.runtime.getURL(`warning.html?id=${id}`),
       type: "popup", width: 460, height: 640, focused: true,
@@ -243,6 +272,10 @@ if (typeof chrome !== "undefined" && chrome.webRequest) {
       return;
     }
     if (msg.type === "ping") { respond({ ok: true }); return; }
+    if (msg.type === "check" && ownPage && typeof msg.url === "string") {
+      checkSite(msg.url).then(respond);
+      return true;
+    }
 
     // CMS hints from the page HTML.
     if (msg.type === "cms-hints" && fromPage) {
@@ -257,9 +290,42 @@ if (typeof chrome !== "undefined" && chrome.webRequest) {
     }
   });
 
+  // ---- Check a site ------------------------------------------------------------------
+  // You type an address in the popup; PHPeek loads that one page without cookies and reads
+  // the same headers it reads passively. Nothing else is fetched and nothing is kept.
+  async function checkSite(input) {
+    let u;
+    try { u = new URL(/^https?:\/\//i.test(input.trim()) ? input.trim() : `https://${input.trim()}`); } catch { return { error: "bad" }; }
+    if (!/^https?:$/.test(u.protocol) || !u.hostname.includes(".")) return { error: "bad" };
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 12000);
+    try {
+      const r = await fetch(u.href, { credentials: "omit", cache: "no-store", redirect: "follow", signal: ctl.signal });
+      const headers = [];
+      r.headers.forEach((value, name) => headers.push({ name, value }));
+      const info = analyseHeaders(headers);
+      let html = "";
+      try {
+        const reader = r.body.getReader(); const dec = new TextDecoder();
+        while (html.length < 300000) { const { done, value } = await reader.read(); if (done) break; html += dec.decode(value, { stream: true }); }
+        reader.cancel().catch(() => {});
+      } catch { /* headers are enough */ }
+      const cms = new Set(info.cms);
+      if (/\/wp-(content|includes)\//i.test(html) || /<meta[^>]+generator[^>]+wordpress/i.test(html)) cms.add("WordPress");
+      if (/x-magento-init|\/static\/version\d+\/frontend\//i.test(html)) cms.add("Magento");
+      return { host: new URL(r.url || u.href).hostname, usesPhp: info.usesPhp || cms.size > 0, cms: [...cms], assessment: assessPhp(info.phpVersion) };
+    } catch {
+      return { error: "unreachable", host: u.hostname };
+    } finally { clearTimeout(timer); }
+  }
+
   chrome.tabs.onRemoved.addListener((tabId) => {
     chrome.storage.session.remove(key(tabId));
-    for (const k of recent.keys()) if (k.startsWith(`${tabId}:`)) recent.delete(k);
+    chrome.storage.session.get(null).then((all) => {
+      const old = Object.keys(all).filter((k) => k.startsWith(`once_${tabId}_`));
+      if (old.length) chrome.storage.session.remove(old);
+    }).catch(() => {});
+    for (const k of recent.keys()) if (k.startsWith(`${tabId}:`) || k === `notify:${tabId}`) recent.delete(k);
   });
 }
 

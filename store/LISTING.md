@@ -1,74 +1,84 @@
-# Store listing copy (v1.1)
+# Store listing copy (v1.2)
 
-Copy-paste into the store forms when you upload v1.1.
+Copy-paste into the store forms when you upload v1.2.
 
 ---
 
 ## Name
-**PHPeek — PHP2Shell Check & Wallet Guard**
+**PHPeek — PHP2Shell Check, Card & Wallet Guard**
 
 ## Summary (Chrome max 132 chars)
-> Flags sites exposed to PHP2Shell. Guards your seed phrase, wallet signatures and clipboard. 100% local, zero data.
+> Flags PHP2Shell-exposed sites, blocks card skimmers, guards passwords, seed phrases, wallet signatures and clipboard. Zero data.
 
 ## Summary (Firefox max 250 chars)
-> Peek before you trust. Flags sites exposed to PHP2Shell (CVE-2026-109618/109619) and guards your seed phrase, wallet signatures and clipboard against drainers and ClickFix on every site. 100% local, zero data, open source.
+> Peek before you trust. Flags sites exposed to PHP2Shell (CVE-2026-109618/109619), blocks card skimmers on hacked stores, and guards your passwords, seed phrase, wallet signatures and clipboard on every site. No tracking, zero data, open source.
 
 ## Description
 ```
 Peek before you trust.
 
-PHP2Shell (CVE-2026-109618 / CVE-2026-109619) let attackers take over millions of unpatched WordPress, Magento, Drupal and Joomla servers. A hacked site doesn't attack you directly: it serves you a fake "restore your wallet" form, a drainer that asks you to sign an approval, or a "verify you're human" page that puts a command in your clipboard.
+PHP2Shell (CVE-2026-109618 / CVE-2026-109619) lets attackers take over unpatched WordPress, Magento, Drupal and Joomla servers, and it's being exploited right now. A hacked site doesn't attack you directly: it hides a script that copies your card at checkout, leaks the password you just typed, or serves a fake "verify you're human" page, a seed-phrase form or a wallet drainer.
 
 PHPeek watches for exactly that.
 
 👀 PHP2SHELL CHECK
 Open any site and the icon tells you:
-🔴 "!" — Likely exposed. Don't type passwords, cards or connect your wallet here.
+🔴 "!" — Likely exposed. Don't type passwords or card details here.
 🟢 "OK" — Patched.
 🟠 "?" — Runs PHP, keeps its version secret.
-One click on "Tell the site owner" opens a ready-to-send email with the fix.
+"Tell the site owner" opens a ready-to-send email with the fix.
+
+🔎 CHECK ANY SITE
+Type a store's address in the popup and check it before you even open it.
+
+💳 CARD GUARD — every site
+Type your card number and PHPeek recognises it if a hidden script tries to send it anywhere other than the store or a payment provider (Stripe, PayPal, Adyen…). That's how card skimmers work. PHPeek blocks it and tells you where it was going.
+On a 🔴 store, a heads-up at the card field: pay with PayPal, Apple Pay, Google Pay or a virtual card instead.
+
+🔑 PASSWORD GUARD
+On a 🔴 site, a heads-up before you type your password: the flaw can leak passwords from the server's memory.
 
 🛡️ SEED SHIELD — every site
-Paste or type a seed phrase into a website and PHPeek clears it and warns you. No real site, wallet or support team ever asks for it.
+Paste or type a seed phrase into a website and PHPeek clears it and warns you.
 
 ✍️ WALLET SIGNATURE CHECK — every site
-Before your wallet pops up, PHPeek pauses what drainers use and explains it in plain words: unlimited token approvals, "approve ALL your NFTs", Permit/Permit2 gasless approvals, marketplace order signatures, delegations, blind signing. You decide: cancel or continue.
+Unlimited token approvals, "approve ALL your NFTs", Permit/Permit2 gasless approvals, marketplace orders, delegations, blind signing: paused and explained in plain words before your wallet pops up.
 
 📋 CLIPBOARD GUARD — every site
-When a site silently puts a command in your clipboard (the "ClickFix" trick), PHPeek swaps it for a harmless warning.
+When a fake "I'm not a robot" page secretly puts a command in your clipboard (ClickFix), PHPeek swaps it for a harmless warning.
 
 Warnings open in a PHPeek window, not on the page, so a hacked site can't hide or fake them.
 
-100% LOCAL. ZERO DATA.
-• No requests. No server. No tracking.
-• Seed words, clipboard text and wallet requests are checked on the spot and never stored or sent.
-• Only checks the tab you're on. Never scans or lists sites.
+NO TRACKING. ZERO DATA.
+• No PHPeek server. No analytics. Nothing collected.
+• Card numbers, seed words, passwords and clipboard text are checked on the spot and never stored or sent.
+• The only time PHPeek contacts a site is when you use "Check any site", and then only that site.
 • Open source, plain readable JavaScript.
 
 HONEST LIMITS
-PHPeek is a safety net, not a shield. It can't remove malware already on your computer, can't stop plain transfers to a wrong address, and a kit built specifically to beat it may get through. Use a hardware wallet, read what your wallet shows, keep your browser updated.
+PHPeek is a safety net, not a shield. Skimmers that encrypt the card or post it back to the hacked store itself can get through, and it can't remove malware already on your computer. Prefer PayPal / Apple Pay / Google Pay on unknown stores, use unique passwords and 2FA.
 
 Run a PHP site? Patched releases: 8.5.12, 8.4.27, 8.3.36, 8.2.35.
 ```
 
 ## Screenshots
-Use the existing four in `store/screenshots/store-*.png`. Optional extra: `warn-approve.png`, `warn-seed.png` (crop to 1280×800 or 640×400 before uploading).
+Existing `store/screenshots/store-*.png` still work. Announcement images in `store/announce-v11/`.
 
 ---
 
-## Chrome: "Privacy practices" tab (v1.1)
+## Chrome: "Privacy practices" tab (v1.2)
 
 **Single purpose:**
-> Warn the user about risks on the website they are visiting: PHP2Shell-exposed servers and the attacks such compromised sites serve (seed-phrase phishing, wallet-drainer signatures, ClickFix clipboard commands).
+> Warn and protect the user on the website they are visiting against risks from compromised sites: PHP2Shell-exposed servers and the attacks such sites serve (card skimmers, password exposure, seed-phrase phishing, wallet-drainer signatures, ClickFix clipboard commands).
 
 **webRequest justification:**
-> Read the HTTP response headers (X-Powered-By, Server, Set-Cookie, Link) of the page the user opens, to detect the PHP version. Read-only; no requests are blocked, modified or made.
+> Read the HTTP response headers (X-Powered-By, Server, Set-Cookie, Link) of the page the user opens, to detect the PHP version. Read-only; no requests are blocked or modified through webRequest.
 
 **Host permission justification:**
-> The check and the guards must run on whichever site the user opens. Content scripts check, locally, (1) text typed/pasted into page fields for seed phrases, (2) wallet requests the page makes (EIP-1193) for risky approvals/signatures, and (3) text the page writes to the clipboard for ClickFix commands. Nothing is stored or transmitted; risky actions open an extension window where the user decides.
+> The check and the guards must run on whichever site the user opens. Content scripts check, locally: (1) whether a card number the user typed is being sent by a page script to a third-party site that isn't a payment provider (anti-skimmer), (2) card/password fields on PHP2Shell-exposed sites (heads-up), (3) text typed/pasted for seed phrases, (4) wallet requests (EIP-1193) for risky approvals/signatures, (5) clipboard writes for ClickFix commands. Host access is also used for "Check any site": when the user types an address in the popup, the extension loads that single page without cookies to read its headers. Nothing is stored or transmitted to us or anyone else.
 
 **storage justification:**
-> Keep the per-tab PHP2Shell verdict in session storage while the tab is open. Cleared on tab close.
+> Keep the per-tab PHP2Shell verdict and "already warned on this site" flags in session storage while the tab is open. Cleared on tab close.
 
 **Remote code:** No, I am not using remote code.
 
@@ -76,10 +86,8 @@ Use the existing four in `store/screenshots/store-*.png`. Optional extra: `warn-
 
 **Privacy policy URL:** `https://github.com/phpeek-ext/phpeek/blob/main/PRIVACY.md`
 
-(The `tabs` permission was removed in v1.1.)
-
-## Firefox: notes to reviewer (v1.1)
-> v1.1 adds local guards. Files: src/inpage.js (MAIN world, thin relay: captures built-ins at document_start, snapshots EIP-1193 requests and clipboard writes, decides nothing); src/rules.js + src/guard.js (isolated world: classification, seed-phrase detection with the bundled BIP39 English wordlist, private DOM-element channel to inpage.js); src/background.js (PHP2Shell header check, opens warning.html in a popup window, builds all warning text from fixed templates). No network requests, no remote code, no data collection, nothing minified. Tests: tests/*.js and tests/e2e_guards.py.
+## Firefox: notes to reviewer (v1.2)
+> v1.2 adds Card Guard, Password Guard and "Check any site". src/cards.js (isolated world, pure: Luhn + card brand check, payment-provider allowlist, skimmer decision). src/inpage.js (MAIN world) gains wrappers on fetch/XHR/sendBeacon/WebSocket/URL setters/form submit/window.open that stay dormant until a card number is typed, then ask the isolated world whether a request carries that number to a non-payment third party; such requests are dropped. Card numbers live only in page memory. "Check any site" (popup) makes one user-initiated fetch with credentials omitted to the address the user typed. No remote code, no data collection, nothing minified. Tests: tests/*.js, tests/e2e_cards.py, tests/e2e_guards.py.
 
 ---
 

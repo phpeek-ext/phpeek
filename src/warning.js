@@ -18,7 +18,7 @@
   const v = info.verdict;
   $("band").className = `band ${v.level}`;
   $("title").textContent = v.title;
-  const kicker = { signature: "Wallet request", seed: "Seed Shield", clipboard: "Clipboard Guard" }[info.kind] || "PHPeek";
+  const kicker = { signature: "Wallet request", seed: "Seed Shield", clipboard: "Clipboard Guard", card: "Card Guard", password: "Password Guard" }[info.kind] || "PHPeek";
   $("kicker").textContent = `PHPeek · ${kicker}`;
   document.title = `PHPeek: ${v.title}`;
 
@@ -48,6 +48,15 @@
     $("go").textContent = "It's not a seed phrase, restore my text";
     $("stop").onclick = () => decide(false);
     $("go").onclick = () => decide(true);
+    return;
+  }
+
+  if (info.kind === "card") {
+    $("stop").textContent = "Don't send my card (recommended)";
+    $("go").textContent = "Send it anyway";
+    $("stop").onclick = () => decide(false);
+    $("go").onclick = () => decide(true);
+    $("stop").focus();
     return;
   }
 

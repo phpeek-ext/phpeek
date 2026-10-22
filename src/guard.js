@@ -64,7 +64,7 @@
     module.exports = { tokens, looksLikePastedSeed, looksLikeTypedSeed, fieldHint };
     return;
   }
-  if (!BIP39 || !globalThis.PHPEEK_RULES) return;
+  if (!BIP39 || !globalThis.PHPEEK_RULES || !globalThis.PHPEEK_CARDS) return;
 
   const send = (msg) => new Promise((resolve) => {
     try {
@@ -142,6 +142,8 @@
 
     if (d.type === "clip") return reply({ block: clipDecision(d) });
 
+    if (d.type === "net") return reply({ block: netDecision(String(d.url || ""), String(d.data || ""), d.opaque === true) });
+
     if (d.type === "sig" && typeof d.id === "string") {
       let v = null;
       try { v = RULES.classify(String(d.method), d.params, { risky }); } catch { v = { code: "", f: {} }; }
@@ -159,6 +161,114 @@
   setTimeout(() => chan.remove(), 0); // never leave it in the DOM, even if the handshake didn't happen
 
   send({ type: "status?" }).then((st) => { if (st) risky = !!st.risky; });
+
+  // ---- Card Guard + Password Guard -------------------------------------------------------
+  // 1) On a store whose server looks exposed to PHP2Shell, a heads-up the moment you reach the
+  //    card field (or a password field). Once per site per tab.
+  // 2) Anti-skimmer: once you type a real card number, a script that tries to send it to a site
+  //    that's neither this store nor a payment provider is stopped. The number only lives in the
+  //    page's memory (shared with same-origin frames of the page), only to recognise it.
+
+  const CARDS = globalThis.PHPEEK_CARDS;
+  // about:blank / srcdoc frames have an empty hostname but inherit the page's origin.
+  const pageHost = location.hostname || (() => { try { return new URL(self.origin).hostname; } catch { return ""; } })();
+  const nativeAction = Object.getOwnPropertyDescriptor(HTMLFormElement.prototype, "action").get;   // <input name="action"> can't shadow this
+  const nativeFormAction = Object.getOwnPropertyDescriptor(HTMLButtonElement.prototype, "formAction").get;
+
+  // Same-origin frames share one list, so a skimmer can't just use a fresh iframe's fetch.
+  let shared = null;
+  try { const p = window.parent; if (p !== window && p.__phpeekCards && Array.isArray(p.__phpeekCards.list)) shared = p.__phpeekCards; } catch { /* cross-origin parent */ }
+  if (!shared) shared = { list: [], trusted: [], frames: [], skimState: "idle", allowed: {} };
+  try { Object.defineProperty(window, "__phpeekCards", { value: shared }); } catch { /* ignore */ }
+  const arm = () => toPage({ type: "arm" });
+  shared.frames.push({ w: typeof WeakRef === "function" ? new WeakRef(window) : null, arm });
+  if (shared.list.length) arm();
+  const armAll = () => {
+    shared.frames = shared.frames.filter((fr) => { const w = fr.w && fr.w.deref(); return !fr.w || (w && !w.closed); });
+    for (const fr of shared.frames) { try { fr.arm(); } catch { /* frame gone */ } }
+  };
+
+  const hostOf = (u) => { try { const x = new URL(u, document.baseURI); return /^(https?|wss?):$/.test(x.protocol) ? x.hostname : ""; } catch { return ""; } };
+
+  // One "stopped" window per page, however many frames the skimmer uses.
+  function warnSkim(dest) {
+    if (shared.skimState !== "idle") return;
+    shared.skimState = "asking";
+    toBackground("card", { code: "skimmer", f: { domain: CARDS.siteOf(dest).slice(0, 40) } })
+      .then((res) => { shared.skimState = res && res.shown ? "shown" : "idle"; });
+  }
+
+  function netDecision(url, data, opaque) {
+    if (!shared.list.length) return false;
+    const dest = hostOf(url);
+    if (!dest) return false;
+    if ((shared.allowed[dest] || 0) > Date.now()) return false;   // you just said "send it anyway"
+    // A body PHPeek can't read (a Blob beacon), going to a foreign non-payment site: drop it quietly.
+    if (opaque) return !CARDS.sameSite(dest, pageHost) && !CARDS.isPaymentHost(dest);
+    const payload = url + "\n" + data;
+    if (!CARDS.skimDecision(dest, pageHost, payload, shared.list)) return false;
+    // Only numbers typed for real (trusted events) can make PHPeek show a window; a page can't
+    // fill a fake number to puppet PHPeek into showing scary text.
+    if (CARDS.skimDecision(dest, pageHost, payload, shared.trusted)) warnSkim(dest);
+    return true;
+  }
+
+  const warnedFor = new Set();
+  function exposedHeadsUp(kind, code) {
+    if (warnedFor.has(code) || CARDS.isPaymentHost(pageHost)) return;   // inside Stripe/Adyen's own frame the card is safe
+    warnedFor.add(code);
+    send({ type: "status?" }).then((st) => {
+      if (st && st.risky) { risky = true; toBackground(kind, { code, f: {} }); }
+    });
+  }
+
+  window.addEventListener("focusin", (e) => {
+    const el = realTarget(e);
+    if (!e.isTrusted || !el || el.tagName !== "INPUT") return;
+    if (el.type === "password") return exposedHeadsUp("password", "password-exposed");
+    if (CARDS.isCardField(el)) exposedHeadsUp("card", "card-exposed");
+  }, true);
+
+  function noteCard(e) {
+    const el = realTarget(e);
+    if (!el || el.tagName !== "INPUT" || el.type === "password") return;
+    const cardField = CARDS.isCardField(el);
+    const c = CARDS.cardFrom(el.value, !cardField);    // fields that don't say "card" need a strict match
+    if (!c) return;
+    if (!shared.list.includes(c)) { shared.list.push(c); if (shared.list.length > 8) shared.list.shift(); }
+    if (e.isTrusted && !shared.trusted.includes(c)) { shared.trusted.push(c); if (shared.trusted.length > 4) shared.trusted.shift(); }
+    armAll();
+    if (cardField && e.isTrusted) exposedHeadsUp("card", "card-exposed");
+  }
+  window.addEventListener("input", noteCard, true);
+  window.addEventListener("change", noteCard, true);
+
+  // A normal form post carrying your card to a site that's neither the store nor a payment
+  // provider. You clicked Pay, so instead of silently dropping it, PHPeek asks.
+  const resubmitting = new WeakSet();
+  window.addEventListener("submit", (e) => {
+    const form = realTarget(e);
+    if (!shared.list.length || !form || form.tagName !== "FORM" || resubmitting.has(form)) return;
+    let data = "";
+    try { for (const [k, v] of new FormData(form)) if (typeof v === "string") data += `${k}=${v}&`; } catch { /* ignore */ }
+    const sub = e.submitter;
+    let action = "";
+    try { action = sub && sub.hasAttribute("formaction") ? nativeFormAction.call(sub) : nativeAction.call(form); } catch { /* ignore */ }
+    const dest = hostOf(action);
+    if (!dest || !CARDS.skimDecision(dest, pageHost, action + "\n" + data, shared.list)) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    // You clicked (or the page submitted right after your click): ask. Otherwise: just stop it.
+    const userish = e.isTrusted || (navigator.userActivation && navigator.userActivation.isActive);
+    if (!userish) return;
+    toBackground("card", { code: "card-send", f: { domain: CARDS.siteOf(dest).slice(0, 40) } }).then((res) => {
+      if (!res || !res.allow) return;
+      // The page's own submit handler often re-submits with form.submit(): let that through too.
+      shared.allowed[dest] = Date.now() + 15000;
+      resubmitting.add(form);
+      try { form.requestSubmit(sub && sub.form === form ? sub : undefined); } catch { HTMLFormElement.prototype.submit.call(form); }
+      setTimeout(() => resubmitting.delete(form), 1000);
+    });
+  }, true);
 
   // ---- Seed Shield ---------------------------------------------------------------------
 

@@ -3,9 +3,47 @@
   const $ = (id) => document.getElementById(id);
   $("footer").textContent = t("footer");
   $("guardsTitle").textContent = t("guardsTitle");
-  for (const [id, key] of [["gSeed", "guardSeed"], ["gSig", "guardSig"], ["gClip", "guardClip"]]) $(id).textContent = t(key);
+  for (const [id, key] of [["gSeed", "guardSeed"], ["gSig", "guardSig"], ["gClip", "guardClip"], ["gCard", "guardCard"], ["gPass", "guardPass"]]) $(id).textContent = t(key);
   $("status").textContent = t("loading");
 
+  // The exact PHP version is deliberately never shown: visitors only need the verdict.
+  function verdict(s) {
+    const usesPhp = s.usesPhp || (s.cms && s.cms.length > 0);
+    const a = s.assessment || {};
+    if (a.status === "vulnerable") return { cls: "vulnerable", text: t("vulnTitle"), note: t("vulnNote"), label: t("statusExposed") };
+    if (a.status === "eol") return { cls: "eol", text: t("eolTitle"), note: t("eolNote"), label: t("statusEol") };
+    if (a.status === "patched") return { cls: "patched", text: t("patchedTitle"), note: "", label: t("statusPatched") };
+    if (usesPhp) return { cls: "unknown", text: t("hiddenTitle"), note: t("hiddenNote"), label: t("statusHidden") };
+    return { cls: "none", text: t("notPhp"), note: "", label: "—" };
+  }
+
+  // ---- Check any site ----------------------------------------------------------------
+  $("checkTitle").textContent = t("checkTitle");
+  $("curl").placeholder = t("checkPlaceholder");
+  $("cbtn").textContent = t("checkBtn");
+  $("cform").onsubmit = async (e) => {
+    e.preventDefault();
+    const url = $("curl").value.trim();
+    if (!url) return;
+    const out = $("cres"); out.textContent = "";
+    $("cbtn").disabled = true; $("cbtn").textContent = t("checking");
+    const r = await new Promise((res) => chrome.runtime.sendMessage({ type: "check", url }, (x) => res(chrome.runtime.lastError ? null : x)));
+    $("cbtn").disabled = false; $("cbtn").textContent = t("checkBtn");
+    const box = document.createElement("div");
+    if (!r || r.error) {
+      box.className = "status none";
+      box.textContent = r && r.error === "bad" ? t("checkBad") : t("checkFail");
+      out.append(box);
+      return;
+    }
+    const v = verdict(r);
+    box.className = `status ${v.cls}`;
+    box.textContent = `${r.host} · ${v.text}`;
+    out.append(box);
+    if (v.note) { const p = document.createElement("p"); p.textContent = v.note; out.append(p); }
+  };
+
+  // ---- this tab ------------------------------------------------------------------------
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const data = tab ? await chrome.storage.session.get(`tab_${tab.id}`) : {};
   const s = tab ? data[`tab_${tab.id}`] : null;
@@ -15,21 +53,7 @@
     return;
   }
 
-  const usesPhp = s.usesPhp || s.cms.length > 0;
-  const a = s.assessment;
-  let cls = "none", text = t("notPhp"), note = "", label = "—";
-
-  // The exact PHP version is deliberately not shown: visitors only need the verdict.
-  if (a.status === "vulnerable") {
-    cls = "vulnerable"; text = t("vulnTitle"); note = t("vulnNote"); label = t("statusExposed");
-  } else if (a.status === "eol") {
-    cls = "eol"; text = t("eolTitle"); note = t("eolNote"); label = t("statusEol");
-  } else if (a.status === "patched") {
-    cls = "patched"; text = t("patchedTitle"); label = t("statusPatched");
-  } else if (usesPhp) {
-    cls = "unknown"; text = t("hiddenTitle"); note = t("hiddenNote"); label = t("statusHidden");
-  }
-
+  const { cls, text, note, label } = verdict(s);
   $("status").className = `status ${cls}`;
   $("status").textContent = text;
 
