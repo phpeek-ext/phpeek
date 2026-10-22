@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "PHPeek — PHP2Shell Check, Card & Wallet Guard"
+    "message": "PHPeek — Hacked-Site Shield (PHP2Shell, Card & Wallet)"
   },
   "extDescription": {
     "message": "Flags PHP2Shell-exposed sites, blocks card skimmers, guards passwords, seed phrases, wallet signatures and clipboard. Zero data."
@@ -15,19 +15,19 @@
     "message": "No PHP in sight. Nothing to worry about here."
   },
   "vulnTitle": {
-    "message": "Likely exposed to PHP2Shell"
+    "message": "Advertises a PHP version affected by PHP2Shell"
   },
   "vulnNote": {
-    "message": "This site advertises a PHP version older than the fix. Don't type passwords, card details or connect your wallet here until it's patched. Some Linux distros patch without bumping the version, so this is a strong hint, not proof."
+    "message": "The server reports a PHP version older than the fix. Avoid typing passwords or card details and connecting your wallet here until it's patched. This is what the server reports, not proof: some Linux distros patch without changing the version number."
   },
   "eolTitle": {
-    "message": "Out of support: no PHP2Shell fix"
+    "message": "Advertises an unsupported PHP version (no PHP2Shell fix)"
   },
   "eolNote": {
-    "message": "This site runs a PHP branch that never got an official fix. Treat it as exposed: no passwords, cards or wallet connections."
+    "message": "The server reports a PHP branch that never got an official fix. Treat it as exposed: no passwords, cards or wallet connections. This is what the server reports, not proof."
   },
   "patchedTitle": {
-    "message": "All good · patched PHP"
+    "message": "No affected PHP version advertised"
   },
   "hiddenTitle": {
     "message": "Runs PHP, keeps its version secret"
@@ -45,13 +45,13 @@
     "message": "CMS"
   },
   "statusExposed": {
-    "message": "exposed"
+    "message": "affected version advertised"
   },
   "statusEol": {
     "message": "out of support"
   },
   "statusPatched": {
-    "message": "patched"
+    "message": "no affected version advertised"
   },
   "statusHidden": {
     "message": "hidden"
@@ -97,5 +97,11 @@
   },
   "checkFail": {
     "message": "Couldn't reach that site."
+  },
+  "patchedNote": {
+    "message": "That's what the server reports, not a guarantee: versions can be hidden or stale. PHPeek's other guards stay on either way."
+  },
+  "welcomeLink": {
+    "message": "What PHPeek does"
   }
 }
