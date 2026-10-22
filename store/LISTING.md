@@ -1,108 +1,104 @@
-# Store listing copy
+# Store listing copy (v1.1)
 
-Copy-paste into the store forms.
+Copy-paste into the store forms when you upload v1.1.
 
 ---
 
-## Chrome Web Store (also covers Brave, Opera, Vivaldi)
+## Name
+**PHPeek — PHP2Shell Check & Wallet Guard**
 
-**Name:** PHPeek — Instant PHP2Shell Check
+## Summary (Chrome max 132 chars)
+> Flags sites exposed to PHP2Shell. Guards your seed phrase, wallet signatures and clipboard. 100% local, zero data.
 
-**Summary** (max 132 chars):
-> Peek before you trust. One glance tells you if a site runs a PHP version exposed to PHP2Shell. Zero data collected.
+## Summary (Firefox max 250 chars)
+> Peek before you trust. Flags sites exposed to PHP2Shell (CVE-2026-109618/109619) and guards your seed phrase, wallet signatures and clipboard against drainers and ClickFix on every site. 100% local, zero data, open source.
 
-**Category:** Developer Tools
-**Language:** English
-
-**Description:**
+## Description
 ```
 Peek before you trust.
 
-Millions of WordPress, Magento, Drupal and Joomla sites run on PHP. PHP2Shell (CVE-2026-109618 / CVE-2026-109619) showed that one request can take over a server running unpatched PHP — no login, no plugin bug needed.
+PHP2Shell (CVE-2026-109618 / CVE-2026-109619) let attackers take over millions of unpatched WordPress, Magento, Drupal and Joomla servers. A hacked site doesn't attack you directly: it serves you a fake "restore your wallet" form, a drainer that asks you to sign an approval, or a "verify you're human" page that puts a command in your clipboard.
 
-You can't see which PHP a site runs. PHPeek can.
+PHPeek watches for exactly that.
 
-ONE GLANCE, THREE ANSWERS
-🔴 "!" — Likely exposed. The site shows a PHP version older than the fix, or PHP 8.1 and below (never patched).
-🟢 "OK" — All good. The PHP version on display is patched.
-🟠 "?" — Runs PHP, keeps its version secret. WordPress, Magento or PHP spotted, version hidden.
-Click the icon for the details.
+👀 PHP2SHELL CHECK
+Open any site and the icon tells you:
+🔴 "!" — Likely exposed. Don't type passwords, cards or connect your wallet here.
+🟢 "OK" — Patched.
+🟠 "?" — Runs PHP, keeps its version secret.
+One click on "Tell the site owner" opens a ready-to-send email with the fix.
 
-100% PASSIVE. ZERO DATA.
-• No requests — never contacts the sites you visit. There's no PHPeek server to phone home to.
-• No tracking — results stay in your browser and vanish when you close the tab.
-• No poking — doesn't test or exploit anything. It just reads headers.
-• Nothing to hide — open source, under 200 lines of JavaScript.
+🛡️ SEED SHIELD — every site
+Paste or type a seed phrase into a website and PHPeek clears it and warns you. No real site, wallet or support team ever asks for it.
 
-THE FINE PRINT
-• Most well-run sites hide their PHP version, so you'll see "?" a lot. That's good security.
-• "!" is a strong hint, not proof: some Linux distros patch without bumping the version number.
-• PHPeek can't tell if a site was already hacked.
+✍️ WALLET SIGNATURE CHECK — every site
+Before your wallet pops up, PHPeek pauses what drainers use and explains it in plain words: unlimited token approvals, "approve ALL your NFTs", Permit/Permit2 gasless approvals, marketplace order signatures, delegations, blind signing. You decide: cancel or continue.
+
+📋 CLIPBOARD GUARD — every site
+When a site silently puts a command in your clipboard (the "ClickFix" trick), PHPeek swaps it for a harmless warning.
+
+Warnings open in a PHPeek window, not on the page, so a hacked site can't hide or fake them.
+
+100% LOCAL. ZERO DATA.
+• No requests. No server. No tracking.
+• Seed words, clipboard text and wallet requests are checked on the spot and never stored or sent.
+• Only checks the tab you're on. Never scans or lists sites.
+• Open source, plain readable JavaScript.
+
+HONEST LIMITS
+PHPeek is a safety net, not a shield. It can't remove malware already on your computer, can't stop plain transfers to a wrong address, and a kit built specifically to beat it may get through. Use a hardware wallet, read what your wallet shows, keep your browser updated.
 
 Run a PHP site? Patched releases: 8.5.12, 8.4.27, 8.3.36, 8.2.35.
 ```
 
-**Screenshots (1280×800):** `store/screenshots/store-1-exposed.png` … `store-4-patched.png`
-**Small promo tile (440×280):** `store/promo-small-440x280.png`
-**Marquee (1400×560, optional):** `store/promo-marquee-1400x560.png`
-**Store icon (128×128):** `src/icons/icon-128.png`
+## Screenshots
+Use the existing four in `store/screenshots/store-*.png`. Optional extra: `warn-approve.png`, `warn-seed.png` (crop to 1280×800 or 640×400 before uploading).
 
-### Privacy practices tab
+---
+
+## Chrome: "Privacy practices" tab (v1.1)
 
 **Single purpose:**
-> Show whether the site in the current tab advertises a PHP version exposed to the PHP2Shell vulnerability.
+> Warn the user about risks on the website they are visiting: PHP2Shell-exposed servers and the attacks such compromised sites serve (seed-phrase phishing, wallet-drainer signatures, ClickFix clipboard commands).
 
-**Permission justifications:**
-- **webRequest:** Read the HTTP response headers (X-Powered-By, Server, Set-Cookie, Link) of the page the user opens, to detect the PHP version. Read-only; no requests are blocked, modified or made.
-- **Host permission (<all_urls>):** The user can open any website, and the check has to run on whichever site they open. Headers are read locally and never sent anywhere.
-- **tabs:** Match the result to the current tab so the badge and popup show the right site.
-- **storage:** Keep the per-tab result in session storage while the tab is open. Cleared on tab close.
+**webRequest justification:**
+> Read the HTTP response headers (X-Powered-By, Server, Set-Cookie, Link) of the page the user opens, to detect the PHP version. Read-only; no requests are blocked, modified or made.
+
+**Host permission justification:**
+> The check and the guards must run on whichever site the user opens. Content scripts check, locally, (1) text typed/pasted into page fields for seed phrases, (2) wallet requests the page makes (EIP-1193) for risky approvals/signatures, and (3) text the page writes to the clipboard for ClickFix commands. Nothing is stored or transmitted; risky actions open an extension window where the user decides.
+
+**storage justification:**
+> Keep the per-tab PHP2Shell verdict in session storage while the tab is open. Cleared on tab close.
 
 **Remote code:** No, I am not using remote code.
 
-**Data usage:** tick **nothing** in the "collects" list, then tick all three certifications:
-- I do not sell or transfer user data to third parties, outside of the approved use cases
-- I do not use or transfer user data for purposes that are unrelated to my item's single purpose
-- I do not use or transfer user data to determine creditworthiness or for lending purposes
+**Data usage:** tick nothing; tick the three certifications.
 
-**Privacy policy URL:** `https://github.com/<your-username>/phpeek/blob/main/PRIVACY.md`
+**Privacy policy URL:** `https://github.com/phpeek-ext/phpeek/blob/main/PRIVACY.md`
 
----
+(The `tabs` permission was removed in v1.1.)
 
-## Firefox Add-ons (addons.mozilla.org)
-
-**Name:** PHPeek — Instant PHP2Shell Check
-**Add-on URL slug:** phpeek
-**Summary** (max 250 chars):
-> Peek before you trust. One glance tells you if the site you're on runs a PHP version exposed to PHP2Shell (CVE-2026-109618 / CVE-2026-109619). 100% passive: no requests, no tracking, no data. Open source.
-
-**Description:** same as Chrome above.
-**Categories:** Privacy & Security; Web Development
-**License:** MIT
-**Privacy policy:** paste the contents of `PRIVACY.md`
-**Homepage:** your GitHub repo URL
-
-**Notes to reviewer:**
-> Passive header check. background.js reads response headers via webRequest (read-only) and stores the result per tab in storage.session. content.js reads a few HTML markers (meta generator, wp-content / Magento script paths). No network requests, no remote code, no data collection. Plain JS, nothing minified or bundled.
+## Firefox: notes to reviewer (v1.1)
+> v1.1 adds local guards. Files: src/inpage.js (MAIN world, thin relay: captures built-ins at document_start, snapshots EIP-1193 requests and clipboard writes, decides nothing); src/rules.js + src/guard.js (isolated world: classification, seed-phrase detection with the bundled BIP39 English wordlist, private DOM-element channel to inpage.js); src/background.js (PHP2Shell header check, opens warning.html in a popup window, builds all warning text from fixed templates). No network requests, no remote code, no data collection, nothing minified. Tests: tests/*.js and tests/e2e_guards.py.
 
 ---
 
-## Launch post (Reddit / X / Mastodon / Hacker News)
+## Launch post for v1.1 (X)
 
-**Short (X / Bluesky / Mastodon):**
-> PHP2Shell is everywhere, and you can't see which sites are still running unpatched PHP.
-> So I built PHPeek 👀 — a free browser extension that peeks at the PHP version any site advertises and flags the exposed ones. 100% passive, zero data, open source.
-> Chrome: <link> · Firefox: <link>
-
-**Longer (r/PHP, r/Wordpress, r/Magento, r/netsec, Hacker News "Show HN"):**
-> **Show HN: PHPeek – see at a glance if a site runs PHP exposed to PHP2Shell**
+**Thread:**
+> 1/ PHPeek v1.1 is out 👀
 >
-> With PHP2Shell (CVE-2026-109618/109619) hitting everything from WordPress to Magento, I wanted a quick way to tell whether the site I'm on is still advertising a vulnerable PHP version.
+> v1 told you if a site runs PHP exposed to PHP2Shell. but the real danger is what a hacked site serves YOU. so v1.1 guards that, on every site:
 >
-> PHPeek reads the response headers your browser already got (X-Powered-By, Server…) and badges the icon: red if the version is below the fix, green if patched, orange if the site runs PHP but hides its version.
+> 2/ 🛡️ Seed Shield: paste or type a seed phrase into a website → cleared + warned. nobody legit ever asks for it
 >
-> It's fully passive — no requests, no telemetry, nothing leaves your browser. Under 200 lines of plain JS, MIT-licensed: <github link>
+> ✍️ wallet signature check: unlimited approvals, setApprovalForAll, Permit/Permit2, blind signing get paused and explained before your wallet pops up
 >
-> Caveats: most well-configured sites hide their version (good!), and distros backport fixes without bumping version numbers, so red means "go check", not "definitely vulnerable".
+> 3/ 📋 Clipboard Guard: a "verify you're human" page sneaks a command into your clipboard → swapped for a harmless warning
 >
-> Feedback welcome.
+> 📨 "tell the owner" button on exposed sites
+>
+> 4/ took the feedback seriously: had an independent review try to break it, fixed every bypass it found (incl. pages that override JS built-ins), 38 real-browser attack tests
+>
+> still 100% local, zero data, open source. it's a safety net, not a shield 🫡
+> github.com/phpeek-ext/phpeek
