@@ -26,15 +26,24 @@
     return hits >= 12 && hits / t.length >= 0.9;
   }
 
-  // A seed being typed: `min`+ words and every single one is a BIP39 word.
-  // Everyday text almost always contains non-BIP39 words ("the", "and", "is", "to"…).
-  // Default 6 keeps product searches like "fresh fish market open today" quiet, while
-  // 6 leaked words still leave the rest of a 12-word seed far beyond brute force.
+  // A seed being typed. Two ways to trip:
+  //  • the whole field is BIP39 words, `min`+ of them (6 by default; 3 in seed-looking fields);
+  //  • the text ENDS in a run of BIP39 words (what's being typed right now), even after other
+  //    text like "here is my seed:" — 8+ words in a normal field, `min`+ in a seed-looking one.
+  // Everyday text almost always contains non-BIP39 words ("the", "and", "is", "to"…), and 8+ in a
+  // row at the end of what you're typing is very rare outside a seed phrase.
+  function trailingRun(t) {
+    let n = 0;
+    for (let i = t.length - 1; i >= 0 && BIP39.has(t[i]); i--) n++;
+    return n;
+  }
   function looksLikeTypedSeed(text, min = 6) {
     const raw = String(text || "").trim();
-    if (!raw || raw.length > 400 || /[^a-zA-Z0-9\s.,:;()]/.test(raw)) return false;
+    if (!raw || raw.length > 2000) return false;
     const t = tokens(raw);
-    return t.length >= min && t.every((w) => BIP39.has(w));
+    const clean = !/[^a-zA-Z0-9\s.,:;()]/.test(raw);
+    if (clean && t.length >= min && t.every((w) => BIP39.has(w))) return true;
+    return trailingRun(t) >= Math.max(min, min <= 3 ? 3 : 8);
   }
 
   // "seed": the field itself asks for a recovery phrase → trip at 3 words.
@@ -158,6 +167,7 @@
 
   let busy = false;
   let bypassUntil = 0;
+  let tripped = [];   // fields we cleared; kept clear while the warning is open
 
   const isEditable = (el) =>
     el && (el.isContentEditable || el.tagName === "TEXTAREA" ||
@@ -187,7 +197,9 @@
     busy = true;
     const saved = fields.map((el) => [el, getVal(el)]);
     saved.forEach(([el]) => setVal(el, ""));
+    tripped = fields;
     const res = await reportSeed();
+    tripped = [];
     if (res && res.allow) {
       bypassUntil = Date.now() + 5000;
       saved.forEach(([el, v]) => setVal(el, v));
@@ -199,7 +211,9 @@
   const isSingleSeedWord = (v) => { v = String(v || "").trim().toLowerCase(); return /^[a-z]{3,8}$/.test(v) && BIP39.has(v); };
 
   function scan(target) {
-    if (busy || Date.now() < bypassUntil || !isEditable(target)) return;
+    // While you're deciding, anything else typed into a cleared field is cleared too.
+    if (busy) { if (tripped.includes(target) && getVal(target)) setVal(target, ""); return; }
+    if (Date.now() < bypassUntil || !isEditable(target)) return;
     const value = getVal(target);
     const hint = target.isContentEditable ? "normal" : fieldHint(target);
     const min = hint === "seed" ? 3 : hint === "password" ? 12 : 6;   // passphrases are fine, a whole seed isn't
