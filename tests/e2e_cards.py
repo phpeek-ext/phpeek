@@ -107,6 +107,15 @@ def main():
                   "--host-resolver-rules=MAP *.example 127.0.0.1, MAP api.stripe.com 127.0.0.1"])
         sw = ctx.service_workers[0] if ctx.service_workers else ctx.wait_for_event("serviceworker")
         ext_id = sw.url.split("/")[2]
+        welcome = next((pg for pg in ctx.pages if pg.url.endswith("/welcome.html")), None)
+        if not welcome:
+            try: welcome = ctx.wait_for_event("page", predicate=lambda pg: pg.url.endswith("/welcome.html"), timeout=8000)
+            except Exception: welcome = None
+        check(welcome is not None, "first install opens the welcome page")
+        if welcome:
+            welcome.wait_for_load_state()
+            check("Card Guard" in welcome.inner_text("body") and "Never" in welcome.inner_text("body"), "welcome page explains the protections")
+            welcome.close()
         warm = ctx.new_page(); warm.goto(base + "/"); time.sleep(0.5); warm.close()
 
         def window_titles():
@@ -251,9 +260,9 @@ def main():
             return ""
 
         out = check_site("http://exposed.example:8101/shop?exposed=1")
-        check("exposed.example" in out and "exposed" in out.lower(), f"check exposed site → flagged ({out.splitlines()[0]})")
+        check("exposed.example" in out and "affected by php2shell" in out.lower(), f"check exposed site → flagged ({out.splitlines()[0]})")
         out = check_site("http://ok.example:8101/?patched=1")
-        check("patched" in out.lower(), "check patched site → all good")
+        check("no affected php version advertised" in out.lower() and "not a guarantee" in out.lower(), "check patched site → 'no affected version advertised', not a guarantee")
         check("8.3" not in out and "8.2" not in out, "never shows the exact version")
         out = check_site("not a url")
         check("doesn't look like" in out, "garbage input → friendly error")

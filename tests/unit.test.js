@@ -25,7 +25,7 @@ assert.deepStrictEqual([h.phpVersion, h.usesPhp, h.cms], [null, false, []]);
 const st = (status, extra = {}) => ({ usesPhp: false, cms: [], assessment: { status }, ...extra });
 assert.strictEqual(badgeFor(st("vulnerable")).text, "!");
 assert.strictEqual(badgeFor(st("eol")).text, "!");
-assert.strictEqual(badgeFor(st("patched")).text, "OK");
+assert.strictEqual(badgeFor(st("patched")).text, "");   // no green "OK": a header is not a guarantee
 assert.strictEqual(badgeFor(st("unknown", { cms: ["WordPress"] })).text, "?");
 assert.strictEqual(badgeFor(st("unknown")).text, "");
 console.log(`unit tests passed (${cases.length} version cases + header/badge checks)`);

@@ -77,6 +77,10 @@ def main():
             permissions=["clipboard-read", "clipboard-write"],
         )
         sw = ctx.service_workers[0] if ctx.service_workers else ctx.wait_for_event("serviceworker")
+        try:  # close_welcome: the first-install page would skew page counts
+            (next((pg for pg in ctx.pages if pg.url.endswith("/welcome.html")), None) or ctx.wait_for_event("page", predicate=lambda pg: pg.url.endswith("/welcome.html"), timeout=8000)).close()
+        except Exception:
+            pass
         ext_id = sw.url.split("/")[2]
         warm = ctx.new_page(); warm.goto(base + "/"); time.sleep(0.5); warm.close()
 

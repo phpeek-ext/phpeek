@@ -12,7 +12,7 @@ SHOTS = ROOT / "store/screenshots"
 
 SITES = {
     8001: ({"X-Powered-By": "PHP/8.2.10"}, '<script src="/wp-content/themes/x/app.js"></script>', "!"),
-    8002: ({"X-Powered-By": "PHP/8.3.36"}, "", "OK"),
+    8002: ({"X-Powered-By": "PHP/8.3.36"}, "", ""),
     8003: ({"Set-Cookie": "PHPSESSID=abc; Path=/"}, '<script type="text/x-magento-init">{}</script>', "?"),
     8004: ({"Server": "nginx"}, "", ""),
     8005: ({"Server": "Apache/2.4.41 (Ubuntu) PHP/7.4.3"}, '<meta name="generator" content="WordPress 6.2">', "!"),
@@ -46,6 +46,10 @@ def main():
                   "--host-resolver-rules=MAP *.example 127.0.0.1"],
         )
         sw = ctx.service_workers[0] if ctx.service_workers else ctx.wait_for_event("serviceworker")
+        try:  # close_welcome: the first-install page would skew page counts
+            (next((pg for pg in ctx.pages if pg.url.endswith("/welcome.html")), None) or ctx.wait_for_event("page", predicate=lambda pg: pg.url.endswith("/welcome.html"), timeout=8000)).close()
+        except Exception:
+            pass
         ext_id = sw.url.split("/")[2]
         # Warm-up: the very first request after browser start can land before the
         # worker's listener is live (same as restored tabs at startup in real use).
